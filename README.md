@@ -28,3 +28,18 @@ See `ZemplerTicketing.http` for sample requests.
 | GET    | `/api/events/{id}`             | Event details with available / reserved / sold counts.        |
 | POST   | `/api/events/{id}/reserve`     | Reserve one available ticket. Body: `{ "holderName": "..." }`.|
 | POST   | `/api/tickets/{id}/purchase`   | Mark a reserved ticket as Sold. 409 if not held by caller.    |
+
+## Design Decisions
+
+### Concurrency
+Uses optimistic concurrency via a `Guid ConcurrencyToken` on the Ticket 
+entity.
+
+If two requests race for the last ticket, only one wins. The other 
+receives `DbUpdateConcurrencyException` → 409 Conflict.
+
+### Architecture
+- Controllers are thin — HTTP concerns only (status codes, routing)
+- Business logic lives in `TicketingService`
+- `ServiceResult<T>` communicates multiple outcomes without throwing 
+  exceptions for control flow
