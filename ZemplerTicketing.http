@@ -1,0 +1,41 @@
+@host = http://localhost:5270
+
+### Get event details
+GET {{host}}/api/events/1
+Accept: application/json
+
+### Reserve a ticket
+POST {{host}}/api/events/1/reserve
+Content-Type: application/json
+
+{
+  "holderName": "Jasper"
+}
+
+### Purchase a reserved ticket
+POST {{host}}/api/tickets/1/purchase
+Content-Type: application/json
+
+{
+  "holderName": "Jasper"
+}
+
+### Event not found (404)
+GET {{host}}/api/events/999
+Accept: application/json
+
+### Validation error - empty holder (400)
+POST {{host}}/api/events/1/reserve
+Content-Type: application/json
+
+{
+  "holderName": ""
+}
+
+### Wrong holder purchase (409)
+POST {{host}}/api/tickets/2/purchase
+Content-Type: application/json
+
+{
+  "holderName": "Wrong Person"
+}
